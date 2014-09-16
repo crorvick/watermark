@@ -4,11 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define LINE_BUF_LEN 1024
-
 struct line_of_text
 {
-	char text[LINE_BUF_LEN];
+	char text[BUFSIZ];
 
 	double size;
 	
@@ -77,7 +75,7 @@ get_lines(cairo_t *cr, FILE *fp)
 	struct line_of_text **next = &ret;
 
 	while (1) {
-		char buf[LINE_BUF_LEN];
+		char buf[BUFSIZ];
 		char *prefix = "";
 		char *text;
 		size_t i, len;
