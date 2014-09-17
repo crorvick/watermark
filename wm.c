@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <getopt.h>
 
 struct line_of_text
 {
@@ -131,28 +132,58 @@ int main(int argc, char *argv[])
 	long image_width, image_height;
 	char *p;
 
-	if (argc < 3 || argc > 4) {
+	while (1) {
+		static const struct option long_opts[] = {
+			{ 0, 0, 0, 0 }
+		};
+
+		int c, opt_idx = 0;
+
+		c = getopt_long(argc, argv, "",
+			long_opts, &opt_idx);
+
+		if (c == -1)
+			break;
+
+		switch (c) {
+		case '?':
+			usage(stderr, argv[0]);
+			exit(1);
+			break;
+
+		default:
+			abort();
+			break;
+		}
+	}
+
+	switch (argc - optind) {
+	default:
 		usage(stderr, argv[0]);
 		exit(1);
-	}
+		break;
 
-	image_width = strtol(argv[1], &p, 0);
-	if (*p != '\0') {
-		fprintf(stderr, "error: invalid width: %s\n", argv[1]);
-		exit(1);
-	}
-	image_height = strtol(argv[2], &p, 0);
-	if (*p != '\0') {
-		fprintf(stderr, "error: invalid height: %s\n", argv[2]);
-		exit(1);
-	}
-
-	if (argc > 3) {
-		in = fopen(argv[3], "r");
+	case 3:
+		in = fopen(argv[optind + 2], "r");
 		if (in == NULL) {
 			perror("fopen");
 			exit(1);
 		}
+		/* fall through */
+	case 2:
+		image_width = strtol(argv[optind + 0], &p, 0);
+		if (*p != '\0') {
+			fprintf(stderr, "error: invalid width: %s\n",
+				argv[optind + 0]);
+			exit(1);
+		}
+		image_height = strtol(argv[optind + 1], &p, 0);
+		if (*p != '\0') {
+			fprintf(stderr, "error: invalid height: %s\n",
+				argv[optind + 1]);
+			exit(1);
+		}
+		break;
 	}
 
 	cairo_surface_t *surface;
