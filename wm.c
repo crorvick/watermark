@@ -115,6 +115,15 @@ get_lines(cairo_t *cr, FILE *fp)
 	return ret;
 }
 
+static cairo_status_t
+write_to_stdio_filp(void *closure, const unsigned char *data, unsigned length)
+{
+
+	return fwrite(data, 1, length, (FILE *) closure) == length
+		? CAIRO_STATUS_SUCCESS
+		: CAIRO_STATUS_WRITE_ERROR;
+}
+
 void usage(FILE *o, const char *arg0)
 {
 	const char *name = strrchr(arg0, '/');
@@ -242,6 +251,6 @@ int main(int argc, char *argv[])
 			y += line->fe.descent;
 		}
 
-		cairo_surface_write_to_png(surface, "text.png");
+		cairo_surface_write_to_png_stream(surface, &write_to_stdio_filp, stdout);
 	}
 }
