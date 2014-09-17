@@ -114,6 +114,15 @@ get_lines(cairo_t *cr, FILE *fp)
 	return ret;
 }
 
+void usage(FILE *o, const char *arg0)
+{
+	const char *name = strrchr(arg0, '/');
+	if (name++ == NULL)
+		name = arg0;
+
+	fprintf(o, "usage: %s WIDTH HEIGHT [ INPUT ]\n", name);
+}
+
 int main(int argc, char *argv[])
 {
 	FILE *in = stdin;
@@ -123,7 +132,7 @@ int main(int argc, char *argv[])
 	char *p;
 
 	if (argc < 3 || argc > 4) {
-		fprintf(stderr, "usage: wm WIDTH HEIGHT [ INPUT ]\n");
+		usage(stderr, argv[0]);
 		exit(1);
 	}
 
