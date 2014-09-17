@@ -131,7 +131,7 @@ void usage(FILE *o, const char *arg0)
 	if (name++ == NULL)
 		name = arg0;
 
-	fprintf(o, "usage: %s WIDTH HEIGHT [ INPUT ]\n", name);
+	fprintf(o, "usage: %s WIDTHxHEIGHT [ INPUT ]\n", name);
 }
 
 int main(int argc, char *argv[])
@@ -140,6 +140,7 @@ int main(int argc, char *argv[])
 	const char *output_file = "-";
 	FILE *in = stdin;
 	FILE *out = stdout;
+	const char *geometry;
 	struct line_of_text *line, *lines;
 	struct line_of_text *last;
 	long image_width, image_height;
@@ -181,23 +182,22 @@ int main(int argc, char *argv[])
 		exit(1);
 		break;
 
-	case 3:
-		input_file = argv[optind + 2];
-		/* fall through */
 	case 2:
-		image_width = strtol(argv[optind + 0], &p, 0);
-		if (*p != '\0') {
-			fprintf(stderr, "error: invalid width: %s\n",
-				argv[optind + 0]);
-			exit(1);
-		}
-		image_height = strtol(argv[optind + 1], &p, 0);
-		if (*p != '\0') {
-			fprintf(stderr, "error: invalid height: %s\n",
-				argv[optind + 1]);
-			exit(1);
-		}
+		input_file = argv[optind + 1];
+	case 1:
+		geometry = argv[optind + 0];
 		break;
+	}
+
+	image_width = strtol(geometry, &p, 10);
+	if (*p != 'x') {
+		fprintf(stderr, "error: invalid geometry: %s\n", geometry);
+		exit(1);
+	}
+	image_height = strtol(p+1, &p, 10);
+	if (*p != '\0') {
+		fprintf(stderr, "error: invalid geometry: %s\n", geometry);
+		exit(1);
 	}
 
 	if (strcmp(input_file, "-") != 0) {
