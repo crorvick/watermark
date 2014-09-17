@@ -136,6 +136,7 @@ void usage(FILE *o, const char *arg0)
 
 int main(int argc, char *argv[])
 {
+	const char *input_file = "-";
 	const char *output_file = "-";
 	FILE *in = stdin;
 	FILE *out = stdout;
@@ -181,11 +182,7 @@ int main(int argc, char *argv[])
 		break;
 
 	case 3:
-		in = fopen(argv[optind + 2], "r");
-		if (in == NULL) {
-			perror("fopen");
-			exit(1);
-		}
+		input_file = argv[optind + 2];
 		/* fall through */
 	case 2:
 		image_width = strtol(argv[optind + 0], &p, 0);
@@ -201,6 +198,15 @@ int main(int argc, char *argv[])
 			exit(1);
 		}
 		break;
+	}
+
+	if (strcmp(input_file, "-") != 0) {
+		in = fopen(input_file, "r");
+		if (out == NULL) {
+			fprintf(stderr, "error: cannot open input file (%s): %s\n",
+				strerror(errno), input_file);
+			exit(1);
+		}
 	}
 
 	if (strcmp(output_file, "-") != 0) {
