@@ -1,5 +1,5 @@
 
 CFLAGS := -g -O0
 
-wm: wm.o
+watermark: main.o
 	gcc -o $@ $^ -lcairo
