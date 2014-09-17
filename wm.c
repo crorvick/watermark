@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include <getopt.h>
 
 struct line_of_text
@@ -135,7 +136,9 @@ void usage(FILE *o, const char *arg0)
 
 int main(int argc, char *argv[])
 {
+	const char *output_file = "-";
 	FILE *in = stdin;
+	FILE *out = stdout;
 	struct line_of_text *line, *lines;
 	struct line_of_text *last;
 	long image_width, image_height;
@@ -143,18 +146,23 @@ int main(int argc, char *argv[])
 
 	while (1) {
 		static const struct option long_opts[] = {
+			{ "output",       required_argument, NULL, 'o' },
 			{ 0, 0, 0, 0 }
 		};
 
 		int c, opt_idx = 0;
 
-		c = getopt_long(argc, argv, "",
+		c = getopt_long(argc, argv, "o:",
 			long_opts, &opt_idx);
 
 		if (c == -1)
 			break;
 
 		switch (c) {
+		case 'o':
+			output_file = optarg;
+			break;
+
 		case '?':
 			usage(stderr, argv[0]);
 			exit(1);
@@ -193,6 +201,15 @@ int main(int argc, char *argv[])
 			exit(1);
 		}
 		break;
+	}
+
+	if (strcmp(output_file, "-") != 0) {
+		out = fopen(output_file, "w");
+		if (out == NULL) {
+			fprintf(stderr, "error: cannot open output file (%s): %s\n",
+				strerror(errno), output_file);
+			exit(1);
+		}
 	}
 
 	cairo_surface_t *surface;
@@ -251,6 +268,6 @@ int main(int argc, char *argv[])
 			y += line->fe.descent;
 		}
 
-		cairo_surface_write_to_png_stream(surface, &write_to_stdio_filp, stdout);
+		cairo_surface_write_to_png_stream(surface, &write_to_stdio_filp, out);
 	}
 }
