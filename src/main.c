@@ -164,6 +164,7 @@ void usage(FILE *o, const char *arg0)
 "\n"
 "Options:\n"
 "  -o, --output FILE             write output to FILE instead of stdout\n"
+"  -h, --help                    display this message and exit\n"
 "\n"
 "Report bugs to: " PACKAGE_BUGREPORT "\n"
 		, name);
@@ -184,12 +185,13 @@ int main(int argc, char *argv[])
 	while (1) {
 		static const struct option long_opts[] = {
 			{ "output",       required_argument, NULL, 'o' },
+			{ "help",         no_argument,       NULL, 'h' },
 			{ 0, 0, 0, 0 }
 		};
 
 		int c, opt_idx = 0;
 
-		c = getopt_long(argc, argv, "o:",
+		c = getopt_long(argc, argv, "o:h",
 			long_opts, &opt_idx);
 
 		if (c == -1)
@@ -198,6 +200,11 @@ int main(int argc, char *argv[])
 		switch (c) {
 		case 'o':
 			output_file = optarg;
+			break;
+
+		case 'h':
+			usage(stdout, argv[0]);
+			exit(0);
 			break;
 
 		case '?':
