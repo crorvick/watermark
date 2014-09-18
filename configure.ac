@@ -6,7 +6,7 @@ LT_INIT
 AC_PROG_CC
 AC_PROG_INSTALL
 
-PKG_CHECK_MODULES([cairo], [cairo])
+PKG_CHECK_MODULES([CAIRO], [cairo])
 
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile src/Makefile])
