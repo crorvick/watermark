@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+#include "config.h"
+
 #include <cairo.h>
 
 #include <stdio.h>
@@ -156,7 +158,15 @@ void usage(FILE *o, const char *arg0)
 	if (name++ == NULL)
 		name = arg0;
 
-	fprintf(o, "usage: %s WIDTHxHEIGHT [ INPUT ]\n", name);
+	fprintf(o,
+"Usage: %s [OPTION]... WIDTHxHEIGHT [FILE]\n"
+"Generate bitmask from input text to be used as a watermark.\n"
+"\n"
+"Options:\n"
+"  -o, --output FILE             write output to FILE instead of stdout\n"
+"\n"
+"Report bugs to: " PACKAGE_BUGREPORT "\n"
+		, name);
 }
 
 int main(int argc, char *argv[])
