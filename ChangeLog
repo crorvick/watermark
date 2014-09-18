@@ -1,0 +1,82 @@
+2014-09-18  Chris Rorvick  <chris@rorvick.com>
+
+	Migrate build to Autotools.
+
+	This is a fairly boilerplate Autotools setup as prescribed in
+	"Autotools: A Practitioner's Guide to GNU Autoconf, Automake,
+	and Libtool" by John Calcote.
+
+	The ChangeLog was generated from the Git commit log using the
+	following command:
+
+	  git log --date=short --pretty=format:'%ad  %an  <%ae>%n%n%w(72,8,8)%B'
+
+	The output was run through sed(1) to convert the indents from
+	spaces to tabs.
+
+2014-09-17  Chris Rorvick  <chris@rorvick.com>
+
+	Restructure the source tree.
+
+	Move the source code into the src/ subdirectory and add a couple 
+	standard build targets.
+
+2014-09-17  Chris Rorvick  <chris@rorvick.com>
+
+	Rename executable: wm => watermark
+
+2014-09-17  Chris Rorvick  <chris@rorvick.com>
+
+	Use the MIT license.
+
+	Basically DWTFYW.
+
+2014-09-17  Chris Rorvick  <chris@rorvick.com>
+
+	Require single geometry argument.
+
+	Accept a geometry specification on the command-line instead of
+	separate width and height arguments.
+
+2014-09-17  Chris Rorvick  <chris@rorvick.com>
+
+	Handle input file more consistently.
+
+	Use "-" as the default input file and make the fopen() logic
+	conditional on having specified something other than this
+	default.  This makes the default case consistent with handling
+	an input file set explicitly to "-".
+
+2014-09-17  Chris Rorvick  <chris@rorvick.com>
+
+	Add --output command-line option.
+
+	Allow an output file to be specified to override the default of
+	writing the PNG to stdout.
+
+2014-09-17  Chris Rorvick  <chris@rorvick.com>
+
+	Write PNG to stdout.
+
+	Get rid of the ugly hardcoded "text.png" output file and just
+	write the PNG to stdout.  This is a sane default.
+
+2014-09-17  Chris Rorvick  <chris@rorvick.com>
+
+	Add skeleton for option parsing.
+
+2014-09-17  Chris Rorvick  <chris@rorvick.com>
+
+	Move logic for printing usage to separate function.
+
+2014-09-16  Chris Rorvick  <chris@rorvick.com>
+
+	Use BUFSIZ for line buffer.
+
+2014-09-16  Chris Rorvick  <chris@rorvick.com>
+
+	Initial commit.
+
+	Renders the input text using the specified font sizes, centering
+	the text both horizontally and vertically.  The desired output
+	is a bitmask in TIFF format, but for the moment it saves to PNG.
