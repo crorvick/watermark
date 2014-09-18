@@ -165,6 +165,7 @@ void usage(FILE *o, const char *arg0)
 "Options:\n"
 "  -o, --output FILE             write output to FILE instead of stdout\n"
 "  -h, --help                    display this message and exit\n"
+"  -v, --version                 display version information and exit\n"
 "\n"
 "Report bugs to: " PACKAGE_BUGREPORT "\n"
 		, name);
@@ -186,12 +187,13 @@ int main(int argc, char *argv[])
 		static const struct option long_opts[] = {
 			{ "output",       required_argument, NULL, 'o' },
 			{ "help",         no_argument,       NULL, 'h' },
+			{ "version",      no_argument,       NULL, 'V' },
 			{ 0, 0, 0, 0 }
 		};
 
 		int c, opt_idx = 0;
 
-		c = getopt_long(argc, argv, "o:h",
+		c = getopt_long(argc, argv, "o:hV",
 			long_opts, &opt_idx);
 
 		if (c == -1)
@@ -200,6 +202,11 @@ int main(int argc, char *argv[])
 		switch (c) {
 		case 'o':
 			output_file = optarg;
+			break;
+
+		case 'V':
+			puts(PACKAGE_STRING);
+			exit(0);
 			break;
 
 		case 'h':
