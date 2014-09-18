@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-#include <cairo/cairo.h>
+#include <cairo.h>
 
 #include <stdio.h>
 #include <stdlib.h>
