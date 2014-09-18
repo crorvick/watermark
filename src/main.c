@@ -36,7 +36,7 @@ struct line_of_text
 	char text[BUFSIZ];
 
 	double size;
-	
+
 	cairo_font_extents_t fe;
 	cairo_text_extents_t te;
 

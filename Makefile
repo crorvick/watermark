@@ -1,5 +1,4 @@
+all clean watermark:
+	cd src && $(MAKE) $@
 
-CFLAGS := -g -O0
-
-watermark: main.o
-	gcc -o $@ $^ -lcairo
+.PHONY: all clean
