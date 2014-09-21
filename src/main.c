@@ -61,7 +61,7 @@ format_line(cairo_t *cr, struct line_of_text *line, const char *prefix)
 	case '5': case '6': case '7': case '8': case '9':
 		v = strtol(prefix, &p, 10);
 		if (*p != '\0') {
-			fprintf(stderr, "error: invalid format: %s\n", prefix);
+			error("invalid format: %s\n", prefix);
 			exit(1);
 		}
 		line->size = v;
@@ -74,7 +74,7 @@ format_line(cairo_t *cr, struct line_of_text *line, const char *prefix)
 			++p;
 		}
 		if (*p != '\0') {
-			fprintf(stderr, "error: invalid format: %s\n", prefix);
+			error("invalid format: %s\n", prefix);
 			exit(1);
 		}
 		cairo_set_font_size(cr, 1000);
@@ -87,7 +87,7 @@ format_line(cairo_t *cr, struct line_of_text *line, const char *prefix)
 		break;
 
 	default:
-		fprintf(stderr, "error: invalid format: %s\n", prefix);
+		error("invalid format: %s\n", prefix);
 		exit(1);
 		break;
 	}
@@ -253,19 +253,19 @@ int main(int argc, char *argv[])
 
 	image_width = strtol(geometry, &p, 10);
 	if (*p != 'x') {
-		fprintf(stderr, "error: invalid geometry: %s\n", geometry);
+		error("invalid geometry: %s\n", geometry);
 		exit(1);
 	}
 	image_height = strtol(p+1, &p, 10);
 	if (*p != '\0') {
-		fprintf(stderr, "error: invalid geometry: %s\n", geometry);
+		error("invalid geometry: %s\n", geometry);
 		exit(1);
 	}
 
 	if (strcmp(input_file, "-") != 0) {
 		in = fopen(input_file, "r");
 		if (out == NULL) {
-			fprintf(stderr, "error: cannot open input file (%s): %s\n",
+			error("cannot open input file (%s): %s\n",
 				strerror(errno), input_file);
 			exit(1);
 		}
@@ -274,7 +274,7 @@ int main(int argc, char *argv[])
 	if (strcmp(output_file, "-") != 0) {
 		out = fopen(output_file, "w");
 		if (out == NULL) {
-			fprintf(stderr, "error: cannot open output file (%s): %s\n",
+			error("cannot open output file (%s): %s\n",
 				strerror(errno), output_file);
 			exit(1);
 		}
