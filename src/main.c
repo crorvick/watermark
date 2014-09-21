@@ -23,6 +23,7 @@
  * SOFTWARE.
  */
 
+#include "debug.h"
 #include "config.h"
 
 #include <cairo.h>
@@ -164,6 +165,8 @@ void usage(FILE *o, const char *arg0)
 "\n"
 "Options:\n"
 "  -o, --output FILE             write output to FILE instead of stdout\n"
+"  -v, --verbose                 increase verbosity\n"
+"  -q, --quiet                   silence all log messages\n"
 "  -h, --help                    display this message and exit\n"
 "  -v, --version                 display version information and exit\n"
 "\n"
@@ -186,6 +189,8 @@ int main(int argc, char *argv[])
 	while (1) {
 		static const struct option long_opts[] = {
 			{ "output",       required_argument, NULL, 'o' },
+			{ "verbose",      required_argument, NULL, 'v' },
+			{ "quiet",        required_argument, NULL, 'q' },
 			{ "help",         no_argument,       NULL, 'h' },
 			{ "version",      no_argument,       NULL, 'V' },
 			{ 0, 0, 0, 0 }
@@ -193,7 +198,7 @@ int main(int argc, char *argv[])
 
 		int c, opt_idx = 0;
 
-		c = getopt_long(argc, argv, "o:hV",
+		c = getopt_long(argc, argv, "o:vqhV",
 			long_opts, &opt_idx);
 
 		if (c == -1)
@@ -202,6 +207,14 @@ int main(int argc, char *argv[])
 		switch (c) {
 		case 'o':
 			output_file = optarg;
+			break;
+
+		case 'v':
+			bump_verbosity();
+			break;
+
+		case 'q':
+			set_verbosity(0);
 			break;
 
 		case 'V':
