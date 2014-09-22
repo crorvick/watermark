@@ -8,6 +8,7 @@ Makefile.in
 .deps/
 /INSTALL
 /aclocal.m4
+/compile
 /config.*
 /configure
 /depcomp
