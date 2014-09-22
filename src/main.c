@@ -165,6 +165,7 @@ void usage(FILE *o, const char *arg0)
 "\n"
 "Options:\n"
 "  -o, --output FILE             write output to FILE instead of stdout\n"
+"  -l, --log FILE                send log output to FILE\n"
 "  -v, --verbose                 increase verbosity\n"
 "  -q, --quiet                   silence all log messages\n"
 "  -h, --help                    display this message and exit\n"
@@ -178,6 +179,7 @@ int main(int argc, char *argv[])
 {
 	const char *input_file = "-";
 	const char *output_file = "-";
+	const char *log_file = "-";
 	FILE *in = stdin;
 	FILE *out = stdout;
 	const char *geometry;
@@ -189,6 +191,7 @@ int main(int argc, char *argv[])
 	while (1) {
 		static const struct option long_opts[] = {
 			{ "output",       required_argument, NULL, 'o' },
+			{ "log",          required_argument, NULL, 'l' },
 			{ "verbose",      required_argument, NULL, 'v' },
 			{ "quiet",        required_argument, NULL, 'q' },
 			{ "help",         no_argument,       NULL, 'h' },
@@ -198,7 +201,7 @@ int main(int argc, char *argv[])
 
 		int c, opt_idx = 0;
 
-		c = getopt_long(argc, argv, "o:vqhV",
+		c = getopt_long(argc, argv, "o:l:vqhV",
 			long_opts, &opt_idx);
 
 		if (c == -1)
@@ -207,6 +210,10 @@ int main(int argc, char *argv[])
 		switch (c) {
 		case 'o':
 			output_file = optarg;
+			break;
+
+		case 'l':
+			log_file = optarg;
 			break;
 
 		case 'v':
@@ -278,6 +285,16 @@ int main(int argc, char *argv[])
 				strerror(errno), output_file);
 			exit(1);
 		}
+	}
+
+	if (strcmp(log_file, "-") != 0) {
+		FILE *log = fopen(log_file, "a");
+		if (log == NULL) {
+			error("cannot open log file (%s): %s\n",
+				strerror(errno), log_file);
+			exit(1);
+		}
+		set_log_stream(log);
 	}
 
 	cairo_surface_t *surface;

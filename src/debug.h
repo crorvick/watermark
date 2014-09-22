@@ -26,9 +26,13 @@
 #ifndef DEBUG_H_included
 #define DEBUG_H_included
 
+#include <stdio.h>
+
 void set_verbosity(int v);
 int get_verbosity();
 int bump_verbosity();
+
+FILE *set_log_stream(FILE *);
 
 #define QUIET 0
 #define ERROR 1

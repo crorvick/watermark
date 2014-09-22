@@ -25,9 +25,9 @@
 
 #include "debug.h"
 
-#include <stdio.h>
 #include <stdarg.h>
 
+static FILE *log_stream = NULL;
 static int verbosity = WARN;
 
 void set_verbosity(int v)
@@ -45,6 +45,22 @@ int bump_verbosity()
 	return ++verbosity;
 }
 
+FILE *set_log_stream(FILE *log)
+{
+	FILE *tmp = log_stream;
+	log_stream = log;
+
+	return tmp;
+}
+
+static FILE *get_log_stream()
+{
+	if (log_stream == NULL)
+		log_stream = stderr;
+
+	return log_stream;
+}
+
 void logmsg(int level, const char *fmt, ...)
 {
 	va_list ap;
@@ -53,6 +69,6 @@ void logmsg(int level, const char *fmt, ...)
 		return;
 
 	va_start(ap, fmt);
-	vfprintf(stderr, fmt, ap);
+	vfprintf(get_log_stream(), fmt, ap);
 	va_end(ap);
 }
