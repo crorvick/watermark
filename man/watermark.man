@@ -1,0 +1,51 @@
+.\"Usage: watermark [OPTION]... WIDTHxHEIGHT [FILE]
+.\"Generate bitmask from input text to be used as a watermark.
+.\"
+.\"Options:
+.\"  -o, --output FILE             write output to FILE instead of stdout
+.\"  -l, --log FILE                send log output to FILE
+.\"  -v, --verbose                 increase verbosity
+.\"  -q, --quiet                   silence all log messages
+.\"  -h, --help                    display this message and exit
+.\"  -v, --version                 display version information and exit
+.\"
+.\"Report bugs to: chris@rorvick.com
+.\"
+.TH WATERMARK 1
+.SH NAME
+watermark \- generate a watermark bitmask from input text
+.SH SYNOPSIS
+.B watermark [-o
+.I output-file
+.B ] [-l
+.I log-file
+.B ]
+.I geometry
+.B [
+.I input-file
+.B ]
+.SH DESCRIPTION
+Read text from stdin and render it to a PNG image of the specified
+geometry.  The font size can be specified per line, either explicitly or
+by specifying a target width.  Finally, the text is centered both
+vertically and horizontally.  The final image is intended to be used
+with ImageMagick's
+.BR composite(1)
+to produce a watermark.
+.OPTIONS
+.IP "-o, --output FILE"
+write output to FILE instead of stdout
+.IP "-l, --log FILE"
+send log output to FILE
+.IP "-v, --verbose"
+increase verbosity
+.IP "-q, --quiet"
+silence all log messages
+.IP "-h, --help"
+display this message and exit
+.IP "-V, --version"
+display version information and exit
+.SH AUTHOR
+Chris Rorvick <chris@rorvick.com>
+.SH "SEE ALSO"
+.BR composite(1)
