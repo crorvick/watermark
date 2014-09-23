@@ -19,7 +19,7 @@ vertically and horizontally.  The final image is intended to be used
 with ImageMagick's
 .BR composite(1)
 to produce a watermark.
-.OPTIONS
+.SH OPTIONS
 .IP "-o, --output FILE"
 write output to FILE instead of stdout
 .IP "-l, --log FILE"
