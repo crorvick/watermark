@@ -1,0 +1,16 @@
+Source: watermark
+Maintainer: Chris Rorvick <chris@rorvick.com>
+Section: misc
+Priority: optional
+Standards-Version: 3.9.2
+Build-Depends: debhelper (>= 9)
+
+Package: watermark
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Renders text in PNG format to be used as a watermark.
+ Reads text from stdin and renders to a PNG image of the specified
+ geometry.  The font size can be specified per line, either explicitly
+ or by specifying a target width.  Finally, the text is centered both
+ vertically and horizontally.  The final image is intended to be used
+ with ImageMagick's composite(1) to produce a watermark.
