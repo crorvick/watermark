@@ -356,4 +356,6 @@ int main(int argc, char *argv[])
 
 		cairo_surface_write_to_png_stream(surface, &write_to_stdio_filp, out);
 	}
+
+	return EXIT_SUCCESS;
 }
