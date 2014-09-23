@@ -170,7 +170,7 @@ void usage(FILE *o, const char *arg0)
 "  -v, --verbose                 increase verbosity\n"
 "  -q, --quiet                   silence all log messages\n"
 "  -h, --help                    display this message and exit\n"
-"  -v, --version                 display version information and exit\n"
+"  -V, --version                 display version information and exit\n"
 "\n"
 "Report bugs to: " PACKAGE_BUGREPORT "\n"
 		, name);
