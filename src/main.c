@@ -109,7 +109,7 @@ get_lines(cairo_t *cr, FILE *fp)
 		char buf[BUFSIZ];
 		char *prefix = "";
 		char *text;
-		size_t i, len;
+		size_t len;
 		struct line_of_text *line = NULL;
 
 		if (fgets(buf, sizeof (buf), fp) == NULL)
