@@ -1,16 +1,3 @@
-.\"Usage: watermark [OPTION]... WIDTHxHEIGHT [FILE]
-.\"Generate bitmask from input text to be used as a watermark.
-.\"
-.\"Options:
-.\"  -o, --output FILE             write output to FILE instead of stdout
-.\"  -l, --log FILE                send log output to FILE
-.\"  -v, --verbose                 increase verbosity
-.\"  -q, --quiet                   silence all log messages
-.\"  -h, --help                    display this message and exit
-.\"  -v, --version                 display version information and exit
-.\"
-.\"Report bugs to: chris@rorvick.com
-.\"
 .TH WATERMARK 1
 .SH NAME
 watermark \- generate a watermark bitmask from input text
