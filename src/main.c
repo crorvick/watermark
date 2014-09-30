@@ -26,6 +26,7 @@
 #include "debug.h"
 #include "config.h"
 
+#include <gdk-pixbuf/gdk-pixbuf.h>
 #include <cairo.h>
 
 #include <stdio.h>
@@ -146,19 +147,33 @@ get_lines(cairo_t *cr, FILE *fp)
 }
 
 static cairo_t *
-create_cairo_context(const char *geometry)
+create_cairo_context(const char *path)
 {
 	cairo_surface_t *surface;
 	long w = 0, h = 0;
 	char *p;
 
-	w = strtol(geometry, &p, 10);
-	if (*p != 'x')
-		return NULL;
+	w = strtol(path, &p, 10);
+	if (*p == 'x')
+		h = strtol(p+1, &p, 10);
 
-	h = strtol(p+1, &p, 10);
-	if (*p != '\0')
-		return NULL;
+	if (w <= 0 || h <= 0 || *p != '\0') {
+		GdkPixbuf *pixbuf, *tmp;
+		GError *error;
+
+		tmp = gdk_pixbuf_new_from_file(path, &error);
+		if (tmp == NULL)
+			return NULL;
+
+		pixbuf = gdk_pixbuf_apply_embedded_orientation(tmp);
+
+		g_object_unref(G_OBJECT(tmp));
+
+		w = gdk_pixbuf_get_width(pixbuf);
+		h = gdk_pixbuf_get_height(pixbuf);
+
+		g_object_unref(G_OBJECT(pixbuf));
+	}
 
 	surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, w, h);
 	if (surface == NULL)
@@ -205,7 +220,7 @@ int main(int argc, char *argv[])
 	const char *log_file = "-";
 	FILE *in = stdin;
 	FILE *out = stdout;
-	const char *geometry;
+	const char *source_image;
 	struct line_of_text *line, *lines;
 	struct line_of_text *last;
 	long image_width, image_height;
@@ -280,7 +295,7 @@ int main(int argc, char *argv[])
 	case 2:
 		input_file = argv[optind + 1];
 	case 1:
-		geometry = argv[optind + 0];
+		source_image = argv[optind + 0];
 		break;
 	}
 
@@ -312,9 +327,9 @@ int main(int argc, char *argv[])
 		set_log_stream(log);
 	}
 
-	cr = create_cairo_context(geometry);
+	cr = create_cairo_context(source_image);
 	if (cr == NULL) {
-		error("invalid geometry: %s\n", geometry);
+		error("invalid geometry specification: %s\n", source_image);
 		exit(1);
 	}
 
