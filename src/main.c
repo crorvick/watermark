@@ -321,7 +321,7 @@ int main(int argc, char *argv[])
 	image_width = cairo_image_surface_get_width(cairo_get_target(cr));
 	image_height = cairo_image_surface_get_height(cairo_get_target(cr));
 
-	/* use the standart Postscript typewriter font */
+	/* use the standard Postscript typewriter font */
 	cairo_select_font_face(cr, "Courier",
 		CAIRO_FONT_SLANT_NORMAL,
 		CAIRO_FONT_WEIGHT_BOLD);
