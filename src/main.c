@@ -210,6 +210,10 @@ int main(int argc, char *argv[])
 	struct line_of_text *last;
 	long image_width, image_height;
 
+	cairo_surface_t *surface;
+	cairo_t *cr;
+	cairo_font_options_t *fo;
+
 	while (1) {
 		static const struct option long_opts[] = {
 			{ "output",       required_argument, NULL, 'o' },
@@ -307,9 +311,6 @@ int main(int argc, char *argv[])
 		}
 		set_log_stream(log);
 	}
-
-	cairo_t *cr;
-	cairo_font_options_t *fo;
 
 	cr = create_cairo_context(geometry);
 	if (cr == NULL) {
