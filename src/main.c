@@ -151,6 +151,7 @@ create_cairo_context(const char *path)
 {
 	cairo_t *cr = NULL;
 	cairo_surface_t *surface = NULL;
+	GdkPixbuf *pixbuf = NULL;
 	long w = 0, h = 0;
 	char *p;
 
@@ -159,7 +160,7 @@ create_cairo_context(const char *path)
 		h = strtol(p+1, &p, 10);
 
 	if (w <= 0 || h <= 0 || *p != '\0') {
-		GdkPixbuf *pixbuf, *tmp;
+		GdkPixbuf *tmp;
 		GError *error;
 
 		if ( (tmp = gdk_pixbuf_new_from_file(path, &error)) == NULL)
@@ -172,8 +173,6 @@ create_cairo_context(const char *path)
 		if (pixbuf != NULL) {
 			w = gdk_pixbuf_get_width(pixbuf);
 			h = gdk_pixbuf_get_height(pixbuf);
-
-			g_object_unref(G_OBJECT(pixbuf));
 		}
 	}
 
@@ -183,9 +182,18 @@ create_cairo_context(const char *path)
 	if ( (cr = cairo_create(surface)) == NULL)
 		goto fail;
 
+	if (pixbuf != NULL) {
+		gdk_cairo_set_source_pixbuf(cr, pixbuf, 0, 0);
+		cairo_paint(cr);
+
+		cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.1);
+	}
+
 fail:
 	if (surface != NULL)
 		cairo_surface_destroy(surface);
+	if (pixbuf != NULL)
+		g_object_unref(G_OBJECT(pixbuf));
 
 	return cr;
 }
@@ -380,7 +388,6 @@ int main(int argc, char *argv[])
 		y -= lines->fe.ascent + lines->te.y_bearing;
 
 		/* center each line at the desired size and render it */
-		cairo_set_source_rgb(cr, 0, 0, 0);
 		for (line = lines; line != NULL; line = line->next) {
 			x = (image_width - line->te.width) / 2;
 			x -= line->te.x_bearing;
