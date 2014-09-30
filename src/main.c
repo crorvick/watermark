@@ -149,7 +149,8 @@ get_lines(cairo_t *cr, FILE *fp)
 static cairo_t *
 create_cairo_context(const char *path)
 {
-	cairo_surface_t *surface;
+	cairo_t *cr = NULL;
+	cairo_surface_t *surface = NULL;
 	long w = 0, h = 0;
 	char *p;
 
@@ -161,25 +162,32 @@ create_cairo_context(const char *path)
 		GdkPixbuf *pixbuf, *tmp;
 		GError *error;
 
-		tmp = gdk_pixbuf_new_from_file(path, &error);
-		if (tmp == NULL)
-			return NULL;
+		if ( (tmp = gdk_pixbuf_new_from_file(path, &error)) == NULL)
+			goto fail;
 
 		pixbuf = gdk_pixbuf_apply_embedded_orientation(tmp);
 
 		g_object_unref(G_OBJECT(tmp));
 
-		w = gdk_pixbuf_get_width(pixbuf);
-		h = gdk_pixbuf_get_height(pixbuf);
+		if (pixbuf != NULL) {
+			w = gdk_pixbuf_get_width(pixbuf);
+			h = gdk_pixbuf_get_height(pixbuf);
 
-		g_object_unref(G_OBJECT(pixbuf));
+			g_object_unref(G_OBJECT(pixbuf));
+		}
 	}
 
-	surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, w, h);
-	if (surface == NULL)
-		return NULL;
+	if ( (surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, w, h)) == NULL)
+		goto fail;
 
-	return cairo_create(surface);
+	if ( (cr = cairo_create(surface)) == NULL)
+		goto fail;
+
+fail:
+	if (surface != NULL)
+		cairo_surface_destroy(surface);
+
+	return cr;
 }
 
 static cairo_status_t
