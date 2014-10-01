@@ -280,6 +280,7 @@ int main(int argc, char *argv[])
 	struct line_of_text *line, *lines;
 	struct line_of_text *last;
 	long image_width, image_height;
+	double aspect_ratio;
 	double rotate = 0.0;
 
 	cairo_surface_t *surface;
@@ -402,8 +403,13 @@ int main(int argc, char *argv[])
 
 	image_width = cairo_image_surface_get_width(cairo_get_target(cr));
 	image_height = cairo_image_surface_get_height(cairo_get_target(cr));
+	aspect_ratio = (double) image_width / image_height;
 
-	if (strcmp(rotate_spec, "none") != 0) {
+	if (strcmp(rotate_spec, "ldiag") == 0) {
+		rotate = -atan(1/aspect_ratio);
+	} else if (strcmp(rotate_spec, "rdiag") == 0) {
+		rotate = atan(1/aspect_ratio);
+	} else if (strcmp(rotate_spec, "none") != 0) {
 		char *p;
 		long degrees = strtol(rotate_spec, &p, 10);
 		info("degrees => %d\n", degrees);
