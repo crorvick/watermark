@@ -198,13 +198,49 @@ fail:
 	return cr;
 }
 
-static cairo_status_t
-write_to_stdio_filp(void *closure, const unsigned char *data, unsigned length)
+static gboolean
+write_to_stdio_filp(const gchar *buf, gsize count, GError **error, gpointer data)
 {
 
-	return fwrite(data, 1, length, (FILE *) closure) == length
-		? CAIRO_STATUS_SUCCESS
-		: CAIRO_STATUS_WRITE_ERROR;
+	return (fwrite(buf, 1, count, (FILE *) data) == count);
+}
+
+static void
+write_image(cairo_t *cr, FILE *fp, const char *type)
+{
+	cairo_surface_t *surface = cairo_get_target(cr);
+	int w = cairo_image_surface_get_width(surface);
+	int h = cairo_image_surface_get_height(surface);
+	GdkPixbuf *pixbuf;
+	GError *error;
+
+	unsigned char *src_data, *dst_data;
+	int src_stride, dst_stride, row, col;
+
+	if ( (pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, 1, 8, w, h)) == NULL)
+		return;
+
+	cairo_surface_flush(surface);
+
+	src_data = cairo_image_surface_get_data(surface);
+	dst_data = gdk_pixbuf_get_pixels(pixbuf);
+	src_stride = cairo_image_surface_get_stride(surface);
+	dst_stride = gdk_pixbuf_get_rowstride(pixbuf);
+
+	for (row = 0; row < h; row++) {
+		guint32 *src = (guint32 *) src_data;
+		for (col = 0; col < w; col++) {
+			dst_data[4 * col + 0] = (src[col] >> 16) & 0xff;
+			dst_data[4 * col + 1] = (src[col] >>  8) & 0xff;
+			dst_data[4 * col + 2] = (src[col] >>  0) & 0xff;
+			dst_data[4 * col + 3] = (src[col] >> 24) & 0xff;
+		}
+
+		src_data += src_stride;
+		dst_data += dst_stride;
+	}
+
+	gdk_pixbuf_save_to_callback(pixbuf, &write_to_stdio_filp, fp, type, &error, NULL);
 }
 
 void usage(FILE *o, const char *arg0)
@@ -400,7 +436,7 @@ int main(int argc, char *argv[])
 			y += line->fe.descent;
 		}
 
-		cairo_surface_write_to_png_stream(cairo_get_target(cr), &write_to_stdio_filp, out);
+		write_image(cr, out, "png");
 	}
 
 	return EXIT_SUCCESS;
