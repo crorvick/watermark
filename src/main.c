@@ -409,6 +409,7 @@ int main(int argc, char *argv[])
 
 	lines = get_lines(cr, in);
 
+	cairo_translate(cr, image_width / 2.0, image_height / 2.0);
 	if (lines != NULL) {
 		double text_height = 0.0;
 		double x, y;
@@ -425,14 +426,14 @@ int main(int argc, char *argv[])
 		text_height -= lines->te.y_bearing;
 		text_height += last->te.height + last->te.y_bearing;
 
-		y = (image_height - text_height) / 2;
+		y = -text_height / 2.0;
 
 		/* nullify the first ascent and use y-bearing instead */
 		y -= lines->fe.ascent + lines->te.y_bearing;
 
 		/* center each line at the desired size and render it */
 		for (line = lines; line != NULL; line = line->next) {
-			x = (image_width - line->te.width) / 2;
+			x = -line->te.width / 2.0;
 			x -= line->te.x_bearing;
 			y += line->fe.ascent;
 
