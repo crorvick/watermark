@@ -162,7 +162,7 @@ create_cairo_context(const char *path)
 
 	if (w <= 0 || h <= 0 || *p != '\0') {
 		GdkPixbuf *tmp;
-		GError *error;
+		GError *error = NULL;
 
 		if ( (tmp = gdk_pixbuf_new_from_file(path, &error)) == NULL)
 			goto fail;
@@ -213,7 +213,7 @@ write_image(cairo_t *cr, FILE *fp, const char *type)
 	int w = cairo_image_surface_get_width(surface);
 	int h = cairo_image_surface_get_height(surface);
 	GdkPixbuf *pixbuf;
-	GError *error;
+	GError *error = NULL;
 
 	unsigned char *src_data, *dst_data;
 	int src_stride, dst_stride, row, col;
