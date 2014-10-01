@@ -32,6 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include <ctype.h>
 #include <errno.h>
 #include <getopt.h>
@@ -275,9 +276,11 @@ int main(int argc, char *argv[])
 	FILE *out = stdout;
 	const char *source_image;
 	const char *output_type = "png";
+	const char *rotate_spec = "none";
 	struct line_of_text *line, *lines;
 	struct line_of_text *last;
 	long image_width, image_height;
+	double rotate = 0.0;
 
 	cairo_surface_t *surface;
 	cairo_t *cr;
@@ -287,6 +290,7 @@ int main(int argc, char *argv[])
 		static const struct option long_opts[] = {
 			{ "output",       required_argument, NULL, 'o' },
 			{ "type",         required_argument, NULL, 't' },
+			{ "rotate",       required_argument, NULL, 'r' },
 			{ "log",          required_argument, NULL, 'l' },
 			{ "verbose",      required_argument, NULL, 'v' },
 			{ "quiet",        required_argument, NULL, 'q' },
@@ -297,7 +301,7 @@ int main(int argc, char *argv[])
 
 		int c, opt_idx = 0;
 
-		c = getopt_long(argc, argv, "o:t:l:vqhV",
+		c = getopt_long(argc, argv, "o:t:r:l:vqhV",
 			long_opts, &opt_idx);
 
 		if (c == -1)
@@ -310,6 +314,10 @@ int main(int argc, char *argv[])
 
 		case 't':
 			output_type = optarg;
+			break;
+
+		case 'r':
+			rotate_spec = optarg;
 			break;
 
 		case 'l':
@@ -395,6 +403,16 @@ int main(int argc, char *argv[])
 	image_width = cairo_image_surface_get_width(cairo_get_target(cr));
 	image_height = cairo_image_surface_get_height(cairo_get_target(cr));
 
+	if (strcmp(rotate_spec, "none") != 0) {
+		char *p;
+		long degrees = strtol(rotate_spec, &p, 10);
+		info("degrees => %d\n", degrees);
+		if (*p == '\0')
+			rotate = degrees * M_PI / 180.0;
+		else
+			warn("unknown rotation: %s\n", rotate_spec);
+	}
+
 	/* use the standard Postscript typewriter font */
 	cairo_select_font_face(cr, "Courier",
 		CAIRO_FONT_SLANT_NORMAL,
@@ -410,6 +428,7 @@ int main(int argc, char *argv[])
 	lines = get_lines(cr, in);
 
 	cairo_translate(cr, image_width / 2.0, image_height / 2.0);
+	cairo_rotate(cr, rotate);
 	if (lines != NULL) {
 		double text_height = 0.0;
 		double x, y;
