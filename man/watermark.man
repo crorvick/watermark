@@ -26,6 +26,8 @@ to produce a watermark.
 .SH OPTIONS
 .IP "-o, --output FILE"
 write output to FILE instead of stdout
+.IP "-t, --type FORMAT"
+use FORMAT when writing output file
 .IP "-l, --log FILE"
 send log output to FILE
 .IP "-v, --verbose"

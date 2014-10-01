@@ -255,6 +255,7 @@ void usage(FILE *o, const char *arg0)
 "\n"
 "Options:\n"
 "  -o, --output FILE             write output to FILE instead of stdout\n"
+"  -t, --type FORMAT             use FORMAT when writing output file\n"
 "  -l, --log FILE                send log output to FILE\n"
 "  -v, --verbose                 increase verbosity\n"
 "  -q, --quiet                   silence all log messages\n"
@@ -273,6 +274,7 @@ int main(int argc, char *argv[])
 	FILE *in = stdin;
 	FILE *out = stdout;
 	const char *source_image;
+	const char *output_type = "png";
 	struct line_of_text *line, *lines;
 	struct line_of_text *last;
 	long image_width, image_height;
@@ -284,6 +286,7 @@ int main(int argc, char *argv[])
 	while (1) {
 		static const struct option long_opts[] = {
 			{ "output",       required_argument, NULL, 'o' },
+			{ "type",         required_argument, NULL, 't' },
 			{ "log",          required_argument, NULL, 'l' },
 			{ "verbose",      required_argument, NULL, 'v' },
 			{ "quiet",        required_argument, NULL, 'q' },
@@ -294,7 +297,7 @@ int main(int argc, char *argv[])
 
 		int c, opt_idx = 0;
 
-		c = getopt_long(argc, argv, "o:l:vqhV",
+		c = getopt_long(argc, argv, "o:t:l:vqhV",
 			long_opts, &opt_idx);
 
 		if (c == -1)
@@ -303,6 +306,10 @@ int main(int argc, char *argv[])
 		switch (c) {
 		case 'o':
 			output_file = optarg;
+			break;
+
+		case 't':
+			output_type = optarg;
 			break;
 
 		case 'l':
@@ -436,7 +443,7 @@ int main(int argc, char *argv[])
 			y += line->fe.descent;
 		}
 
-		write_image(cr, out, "png");
+		write_image(cr, out, output_type);
 	}
 
 	return EXIT_SUCCESS;
