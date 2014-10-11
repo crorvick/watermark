@@ -257,6 +257,7 @@ void usage(FILE *o, const char *arg0)
 "Options:\n"
 "  -o, --output FILE             write output to FILE instead of stdout\n"
 "  -t, --type FORMAT             use FORMAT when writing output file\n"
+"  -r, --rotate DEGREES          rotate the watermark text by DEGREES\n"
 "  -l, --log FILE                send log output to FILE\n"
 "  -v, --verbose                 increase verbosity\n"
 "  -q, --quiet                   silence all log messages\n"
