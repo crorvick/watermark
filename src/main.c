@@ -202,17 +202,16 @@ fail:
 static gboolean
 write_to_stdio_filp(const gchar *buf, gsize count, GError **error, gpointer data)
 {
-
 	return (fwrite(buf, 1, count, (FILE *) data) == count);
 }
 
 static void
-write_image(cairo_t *cr, FILE *fp, const char *type)
+write_image(cairo_t *cr, FILE *fp, const char *type, int rotate)
 {
 	cairo_surface_t *surface = cairo_get_target(cr);
 	int w = cairo_image_surface_get_width(surface);
 	int h = cairo_image_surface_get_height(surface);
-	GdkPixbuf *pixbuf;
+	GdkPixbuf *pixbuf, *tmp;
 	GError *error = NULL;
 
 	unsigned char *src_data, *dst_data;
@@ -241,6 +240,12 @@ write_image(cairo_t *cr, FILE *fp, const char *type)
 		dst_data += dst_stride;
 	}
 
+	if (rotate != 0) {
+		tmp = gdk_pixbuf_rotate_simple(pixbuf, rotate);
+		g_object_unref(G_OBJECT(pixbuf));
+		pixbuf = tmp;
+	}
+
 	gdk_pixbuf_save_to_callback(pixbuf, &write_to_stdio_filp, fp, type, &error, NULL);
 }
 
@@ -258,6 +263,7 @@ void usage(FILE *o, const char *arg0)
 "  -o, --output FILE             write output to FILE instead of stdout\n"
 "  -t, --type FORMAT             use FORMAT when writing output file\n"
 "  -r, --rotate DEGREES          rotate the watermark text by DEGREES\n"
+"  -r, --orient ORIENTATION      write final image with ORIENTATION\n"
 "  -l, --log FILE                send log output to FILE\n"
 "  -v, --verbose                 increase verbosity\n"
 "  -q, --quiet                   silence all log messages\n"
@@ -278,11 +284,13 @@ int main(int argc, char *argv[])
 	const char *source_image;
 	const char *output_type = "png";
 	const char *rotate_spec = "none";
+	const char *orient_spec = "none";
 	struct line_of_text *line, *lines;
 	struct line_of_text *last;
 	long image_width, image_height;
 	double aspect_ratio;
 	double rotate = 0.0;
+	int rotate_image = 0;
 
 	cairo_surface_t *surface;
 	cairo_t *cr;
@@ -293,6 +301,7 @@ int main(int argc, char *argv[])
 			{ "output",       required_argument, NULL, 'o' },
 			{ "type",         required_argument, NULL, 't' },
 			{ "rotate",       required_argument, NULL, 'r' },
+			{ "orient",       required_argument, NULL, 'O' },
 			{ "log",          required_argument, NULL, 'l' },
 			{ "verbose",      required_argument, NULL, 'v' },
 			{ "quiet",        required_argument, NULL, 'q' },
@@ -303,7 +312,7 @@ int main(int argc, char *argv[])
 
 		int c, opt_idx = 0;
 
-		c = getopt_long(argc, argv, "o:t:r:l:vqhV",
+		c = getopt_long(argc, argv, "o:t:r:O:l:vqhV",
 			long_opts, &opt_idx);
 
 		if (c == -1)
@@ -320,6 +329,10 @@ int main(int argc, char *argv[])
 
 		case 'r':
 			rotate_spec = optarg;
+			break;
+
+		case 'O':
+			orient_spec = optarg;
 			break;
 
 		case 'l':
@@ -420,6 +433,14 @@ int main(int argc, char *argv[])
 			warn("unknown rotation: %s\n", rotate_spec);
 	}
 
+	if (strcmp(orient_spec, "portrait") == 0) {
+		rotate_image = (aspect_ratio > 1.05 ? 90 : 0);
+	} else if (strcmp(orient_spec, "landscape") == 0) {
+		rotate_image = (aspect_ratio < 0.95 ? 90 : 0);
+	} else if (strcmp(orient_spec, "none") != 0) {
+		warn("unknown orientation: %s\n", orient_spec);
+	}
+
 	/* use the standard Postscript typewriter font */
 	cairo_select_font_face(cr, "Courier",
 		CAIRO_FONT_SLANT_NORMAL,
@@ -470,7 +491,7 @@ int main(int argc, char *argv[])
 			y += line->fe.descent;
 		}
 
-		write_image(cr, out, output_type);
+		write_image(cr, out, output_type, rotate_image);
 	}
 
 	return EXIT_SUCCESS;
