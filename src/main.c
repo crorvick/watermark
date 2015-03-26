@@ -185,10 +185,13 @@ create_cairo_context(const char *path)
 
 	if (pixbuf != NULL) {
 		gdk_cairo_set_source_pixbuf(cr, pixbuf, 0, 0);
-		cairo_paint(cr);
-
-		cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.1);
+	} else {
+		cairo_set_source_rgb(cr, 0,0,0);
 	}
+
+	cairo_paint(cr);
+
+	cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.1);
 
 fail:
 	if (surface != NULL)
