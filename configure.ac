@@ -12,6 +12,7 @@ AC_CHECK_LIB([m], [tan])
 PKG_CHECK_MODULES([GDK], [gdk-2.0])
 PKG_CHECK_MODULES([GDK_PIXBUF], [gdk-pixbuf-2.0])
 PKG_CHECK_MODULES([CAIRO], [cairo])
+PKG_CHECK_MODULES([POPPLERGLIB], [poppler-glib])
 
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile src/Makefile])

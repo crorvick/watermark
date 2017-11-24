@@ -28,6 +28,7 @@
 
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <cairo.h>
+#include <poppler.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,6 +50,97 @@ struct line_of_text
 	struct line_of_text *next;
 };
 
+#define IMAGE_DPI 600
+
+static cairo_t *
+popplermain(const char *pdf_file)
+{
+    PopplerDocument *document;
+    PopplerPage *page;
+    double width, height;
+    GError *error;
+    gchar *absolute, *uri;
+    int page_num, num_pages;
+    cairo_surface_t *surface;
+    cairo_t *cr;
+    cairo_status_t status;
+
+    printf("popplermain\n");
+
+    page_num = 1;
+    /*g_type_init (); */
+    error = NULL;
+
+    if (g_path_is_absolute(pdf_file)) {
+        absolute = g_strdup (pdf_file);
+    } else {
+        gchar *dir = g_get_current_dir ();
+        absolute = g_build_filename (dir, pdf_file, (gchar *) 0);
+        free (dir);
+    }
+
+    uri = g_filename_to_uri (absolute, NULL, &error);
+    free (absolute);
+    if (uri == NULL) {
+        printf("%s\n", error->message);
+        return NULL;
+    }
+
+    document = poppler_document_new_from_file (uri, NULL, &error);
+    if (document == NULL) {
+        printf("%s\n", error->message);
+        return NULL;
+    }
+
+    num_pages = poppler_document_get_n_pages (document);
+    if (page_num < 1 || page_num > num_pages) {
+        printf("page must be between 1 and %d\n", num_pages);
+        return NULL;
+    }
+
+    page = poppler_document_get_page (document, page_num - 1);
+    if (page == NULL) {
+        printf("poppler fail: page not found\n");
+        return NULL;
+    }
+
+    poppler_page_get_size (page, &width, &height);
+
+    /* For correct rendering of PDF, the PDF is first rendered to a
+     * transparent image (all alpha = 0). */
+    surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32,
+                                          IMAGE_DPI*width/72.0,
+                                          IMAGE_DPI*height/72.0);
+    cr = cairo_create (surface);
+    cairo_save (cr);
+    cairo_scale (cr, IMAGE_DPI/72.0, IMAGE_DPI/72.0);
+    cairo_save (cr);
+    poppler_page_render (page, cr);
+    cairo_restore (cr);
+    g_object_unref (page);
+
+    /* Then the image is painted on top of a white "page". Instead of
+     * creating a second image, painting it white, then painting the
+     * PDF image over it we can use the CAIRO_OPERATOR_DEST_OVER
+     * operator to achieve the same effect with the one image. */
+    cairo_set_operator (cr, CAIRO_OPERATOR_DEST_OVER);
+    cairo_set_source_rgb (cr, 1, 1, 1);
+    cairo_paint (cr);
+
+    status = cairo_status(cr);
+    if (status)
+        printf("%s\n", cairo_status_to_string (status));
+
+    /*cairo_destroy (cr);  */
+    cairo_surface_destroy (surface);
+
+    g_object_unref (document);
+    cairo_restore (cr);
+
+    return cr;
+}
+
+
 void
 format_line(cairo_t *cr, struct line_of_text *line, const char *prefix)
 {
@@ -57,7 +149,6 @@ format_line(cairo_t *cr, struct line_of_text *line, const char *prefix)
 	double v;
 	char *p;
 	cairo_text_extents_t te;
-
 
 	switch (*prefix) {
 	case '0': case '1': case '2': case '3': case '4':
@@ -191,13 +282,14 @@ create_cairo_context(const char *path)
 
 	cairo_paint(cr);
 
-	cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.1);
-
 fail:
 	if (surface != NULL)
 		cairo_surface_destroy(surface);
 	if (pixbuf != NULL)
 		g_object_unref(G_OBJECT(pixbuf));
+
+	if (cr == NULL)  /* maybe its a PDF */
+		cr = popplermain(path);
 
 	return cr;
 }
@@ -298,6 +390,7 @@ int main(int argc, char *argv[])
 	cairo_surface_t *surface;
 	cairo_t *cr;
 	cairo_font_options_t *fo;
+        cairo_status_t status;
 
 	while (1) {
 		static const struct option long_opts[] = {
@@ -449,6 +542,8 @@ int main(int argc, char *argv[])
 		CAIRO_FONT_SLANT_NORMAL,
 		CAIRO_FONT_WEIGHT_BOLD);
 
+	cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.1);
+
 	/* final output is a 1-bit TIFF; disable font aliasing */
 	fo = cairo_font_options_create();
 	cairo_get_font_options(cr, fo);
@@ -490,6 +585,10 @@ int main(int argc, char *argv[])
 			cairo_move_to(cr, x, y);
 			cairo_set_font_size(cr, line->size);
 			cairo_show_text(cr, line->text);
+			printf("line: %s\n", line->text);
+		        status = cairo_status(cr);
+		        if (status)
+		    		printf("%s\n", cairo_status_to_string (status));
 
 			y += line->fe.descent;
 		}
