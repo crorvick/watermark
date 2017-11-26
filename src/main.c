@@ -65,7 +65,7 @@ popplermain(const char *pdf_file)
     cairo_t *cr;
     cairo_status_t status;
 
-    printf("popplermain\n");
+    /* printf("popplermain\n"); */
 
     page_num = 1;
     /*g_type_init (); */
@@ -585,7 +585,7 @@ int main(int argc, char *argv[])
 			cairo_move_to(cr, x, y);
 			cairo_set_font_size(cr, line->size);
 			cairo_show_text(cr, line->text);
-			printf("line: %s\n", line->text);
+			/* printf("line: %s\n", line->text); */
 		        status = cairo_status(cr);
 		        if (status)
 		    		printf("%s\n", cairo_status_to_string (status));
